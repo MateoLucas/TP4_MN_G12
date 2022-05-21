@@ -153,5 +153,7 @@ def test():
         print('Test '+str(n)+', error obtenido: '+str(np.linalg.norm(np.transpose(y.y)-x)))
         n+=1
 
+
+
 higginsselkov()
 test()
