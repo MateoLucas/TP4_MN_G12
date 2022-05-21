@@ -2,43 +2,73 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 
-def ruku4(f, t0, tf, delta_t, x0):
-    assert delta_t > 0, 'Error: se requiere delta_t mayor a 0'
-    assert tf > t0, 'Error: el intervalo [t0, tf] está mal definido'
-    
-    xk = x0
-    tk = t0
+#RK4 METHOD
 
-    t_array = np.arange(t0, tf, delta_t)
-    x_array = x0
 
-    for i in t_array:
-        if i == 0: continue #omito rellenar el primer valor, pues es x0
-        f1 = f(tk, xk)
-        f2 = f(tk + (delta_t/2), xk + ((delta_t*f1)/2))
-        f3 = f(tk + (delta_t/2), xk + ((delta_t*f2)/2))
-        f4 = f(tk+delta_t , xk+delta_t*f3)
+def ruku4(f,t0,tf,h,x0):
+    ite = round((tf-t0)/h)+1  # Se calcula la cantidad de veces a iterar
+    dim = np.size(x0) # Dimensión del problema
+    t = np.linspace(t0,tf,ite)
+    x = np.empty((np.size(t),dim))
+    x[0,:] = np.transpose(x0)
+    for i in range(0,ite-1):
+        f1=f(t[i],x[i,:])
+        f2=f(t[i]+(h/2),x[i,:]+(h*f1/2))
+        f3=f(t[i]+(h/2),x[i,:]+(h*f2/2))
+        f4=f(t[i]+h,x[i,:]+h*f3)
+        
+        x[i+1,:] = x[i,:]+((f1+2*f2+2*f3+f4)*h/6.0)
 
-        xk = xk + (f1+2*f2+2*f3+f4)*delta_t/6
-        x_array = np.vstack([x_array, xk])
+    return t,x
 
-    return t_array, x_array
+#HH
+#definimos fuinciones y constantes afuera de la funcion para no
+#redefinirlas cada vez que hacemos el llamado
+#Pasar incognitas como [v,n,m,h]
+def alpha_n(v): return (0.01*((v+55)/(1-(np.e**(-1*((v+55)/(10)))))))
+def alpha_m(v): return (0.01*((v+40)/(1-(np.e**(-1*((v+40)/(10)))))))
+def alpha_h(v): return 0.07*(np.e**(-1*((v+65)/20)))
+def beta_n(v): return 0.125*(np.e**(-1*((v+65)/80)))
+def beta_m(v): return 4*(np.e**(-1*((v+65)/18)))
+def beta_h(v): return (1/(1+(np.e**(-1*((v+35)/10)))))
+gNa = 120.0
+gK = 36.0
+gL = 0.3
+vNa = 50.0
+vK=-77.0
+vL=-54.4
+i0 = 2
+C=1
 
+def HH_eq(t,X):
+    dv = (1/C)*(i0-gNa*(X[2]**3)*X[3]*(X[0]-vNa)-gK*(X[1]**4)*(X[0]-vK)-gL*(X[0]-vL))
+    dn = alpha_n(X[0])*(1-X[1])-beta_n(X[0])*X[1]
+    dm = alpha_m(X[0])*(1-X[2])-beta_m(X[0])*X[2]
+    dh = alpha_h(X[0])*(1-X[3])-beta_h(X[3])*X[3]
+    return np.array([dv,dn,dm,dh])
 
 def  hodgkinhuxley():
-    def alpha_n(v): return (0.01*((v+55)/(1-(np.e**(-1*((v+55)/(10)))))))
-    def alpha_m(v): return (0.01*((v+40)/(1-(np.e**(-1*((v+40)/(10)))))))
-    def alpha_h(v): return 0.07*(np.e**(-1*((v+65)/20)))
-    def beta_n(v): return 0.125*(np.e**(-1*((v+65)/80)))
-    def beta_m(v): return 4*(np.e**(-1*((v+65)/18)))
-    def beta_h(v): return (1/(1+(np.e**(-1*((v+35)/10)))))
-    gNa = 120
-    gK = 36
-    gL = 0.3
-    vNa = 50
-    vK=-77
-    vL=-54.4
-    C=1
+
+    x0 = np.array([-65, 0,0,0])
+    t,x =ruku4(HH_eq,0,200,1e-4,x0)
+
+    #gráfico
+    HH = plt.figure("Potencial de Acción HH")
+    plt.xlabel("t[ms]")
+    plt.ylabel("V(t)[mV]")
+    plt.plot(t,x[:,0],color = "#40eb34")
+
+
+    plt.show()
+    return t,x
+
+
+
+
+
+a=hodgkinhuxley()
+
+
 
 
 
