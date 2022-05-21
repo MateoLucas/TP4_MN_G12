@@ -24,90 +24,25 @@ def ruku4(f, t0, tf, delta_t, x0):
 
     return t_array, x_array
 
-def comprobarOsc(y):
-    i = 0
-    j = -1
 
-    while(y[i] > y[i+1]): #busco el primer mínimo
-        i += 1
-    while(y[i] < y[i+1]): #voy hasta el máximo
-        i += 1
-    y1 = y[i] #registro el valor de y para el primer máximo
-    while(y[i] > y[i+1]): #voy hasta el mínimo
-        i += 1
-    y2 = y[i] #registro el valor de y para el primer mínimo
-    while(y[j] > y[j-1]): #repito lo mismo desde "atrás"
-        j -= 1
-    while(y[j] < y[j-1]):
-        j -= 1
-    y3 = y[j]
-    while(y[j] > y[j-1]):
-        j -= 1
-    y4 = y[j]
-    
-    return (y3-y4)/(y1-y2) > 0.1
+def  hodgkinhuxley():
+    def alpha_n(v): return (0.01*((v+55)/(1-(np.e**(-1*((v+55)/(10)))))))
+    def alpha_m(v): return (0.01*((v+40)/(1-(np.e**(-1*((v+40)/(10)))))))
+    def alpha_h(v): return 0.07*(np.e**(-1*((v+65)/20)))
+    def beta_n(v): return 0.125*(np.e**(-1*((v+65)/80)))
+    def beta_m(v): return 4*(np.e**(-1*((v+65)/18)))
+    def beta_h(v): return (1/(1+(np.e**(-1*((v+35)/10)))))
+    gNa = 120
+    gK = 36
+    gL = 0.3
+    vNa = 50
+    vK=-77
+    vL=-54.4
+    C=1
 
-def higginsselkov(): #x = (s, p)    
-    t0, tf, delta_t = 0, 600, 0.1
 
-    x0 = np.array([2, 3])
-    
-    g = lambda t, u: np.array([v0-0.23*u[0]*u[1]**2, 0.23*u[0]*u[1]**2-0.4*u[1]], dtype=float);
 
-    fig, (ax1, ax2, ax3) = plt.subplots(3, 1)
-    fig.suptitle('Solución a la ecuación de Higgins-Selkov para distintos valores de v0')
-    
-    l1 = 0.48
-    l2 = 0.6
 
-    x, xl1, xl2, t = [], [], [], []
-
-    v0 = l1
-    t, xl1 = ruku4(g, t0, tf, delta_t, x0)
-
-    ax1.plot(t, xl1[:, 0])    
-    ax1.plot(t, xl1[:, 1])
-    ax1.set(ylabel='v0 = '+str(l1))
-    ax1.legend(['[F6P]', '[ADP]'])
-    ax1.grid()
-
-    v0 = l2
-    t, xl2 = ruku4(g, t0, tf, delta_t, x0)
-
-    ax3.plot(t, xl2[:, 0])
-    ax3.plot(t, xl2[:, 1])
-    ax3.set(ylabel='v0 = '+str(l2), xlabel='tiempo [s]')
-    ax3.legend(['[F6P]', '[ADP]'])
-    ax3.grid()
-
-    v0 = 0.5*(l1+l2)
-
-    MAX_ITER = 100
-    i = 0
-
-    while(i < MAX_ITER):
-        t, x = ruku4(g, t0, tf, delta_t, x0)
-
-        s = x[:, 0]
-        p = x[:, 1]
-
-        if(comprobarOsc(s) and comprobarOsc(p)):
-            l1 = v0
-        else:
-            l2 = v0
-
-        v0 = 0.5*(l1+l2)
-        i += 1
-
-    ax2.plot(t, x[:, 0])
-    ax2.plot(t, x[:, 1])
-    ax2.set(ylabel='v0 = '+str(v0))
-    ax2.legend(['[F6P]', '[ADP]'])
-    ax2.grid()
-
-    plt.show()
-
-    print('El valor de v0 para el cual s y p entran en régimen oscilatorio es aproximadamente '+str(v0))
 
 def test():
     t0, tf, delta_t = 0, 150, 20e-4
@@ -154,6 +89,3 @@ def test():
         n+=1
 
 
-
-higginsselkov()
-test()
