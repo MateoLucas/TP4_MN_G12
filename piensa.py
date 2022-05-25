@@ -52,51 +52,8 @@ def  hodgkinhuxley():
     x0 = np.array([-65, 0,0,0])
     t,x =ruku4(HH_eq,0,200,1e-2,x0)
     return t,x
-"""
-def test():
-    
-    #Se testea la funcion ruku4 con un ejemplo conocido
-    T0=np.array([1000]) #Temperatura inicial del objeto en K
-    t0=0
-    tf=1000
-    m,w=ruku4 (derivadatest,t0,tf,0.01,T0)
-    T=w[0]
-        #Solucion analitica conocida para comparar
-    h=100 #Unidades de W/m**2K coeficiente de transferencia de energia
-    A=0.00001 #Area superficial en unidades de m**2
-    p=7800 #densidad del objeto en unidades de kg/cm**2
-    C=500 #Unidades de J/kgK Capacidad calorifica especifica
-    V=0.00000001 #Volumen en m**3
-    Ta=298 #Unidades de K temperatura ambiente 
-    T0=1000 #Temperatura inicial en K
-    M=Ta+(T0-Ta)*np.exp(-((h*A)/(p*C*V))*m) #solucion analitica
-    plot_grafico(m,[T,M],"Tiempo [s]","Temperatura [K]",refs=["Solucion con ruku4","Solucion analitica"])
-    plot_grafico(m,[np.abs(T-M)],"Tiempo [s]","Error [K]",refs=0)
-    
-    #Se testea HH utilizando una funcion de la libreria de Python
-    t0=0
-    tf=200
-    x0=np.array([-65, 0, 0, 0])
-    t,x=ruku4(derivada, t0 ,tf ,0.01,x0)
-    v=x[0]
-    s45=solve_ivp(derivada,[0,200],x0,method='RK45', t_eval=t, rtol=1e-13, atol=1e-14)
-    x45=s45.y
-    plot_grafico(t,[x45[0,:]],"Tiempo [ms]","Potencial de membrana [mV]",refs=0)
-    error1=np.abs(x45[0,:]-v)
-    plot_grafico(t,[error1],"Tiempo [ms]","Potencial de membrana [mV]",refs=0)
-    
-    #Justificacion de la eleccion del paso 
-    t2,x2=ruku4(derivada, t0, tf,0.01/2,x0) #Se utiliza la mitad del paso elegido 
-    v2=x2[0]
-    s45bis=solve_ivp(derivada,[0,200],x0,method='RK45', t_eval=t2, rtol=1e-13, atol=1e-14)
-    x45bis=s45bis.y
-    error2 = np.abs (x45bis[0,:]-v2) #error del orden de 1e-6 con 0.01 y del orden de 1e-9 con 0.001
-    plot_grafico(t2,[error2],"Tiempo [ms]","Potencial de membrana [mV]",refs=0)
-    print(max(error1)/max(error2)) #Error relativo da 15.9934107 con 0.01 y 13.228723 con 0.001 
-    
-    return 
 
-"""
+
 def test():
     #Sistema de HH
     x0 = np.array([-65, 0,0,0])
